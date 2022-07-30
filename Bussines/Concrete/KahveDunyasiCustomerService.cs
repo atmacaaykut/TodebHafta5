@@ -42,7 +42,7 @@ namespace Bussines.Concrete
             validator.Validate(request).ThrowIfException();
             var entity = _mapper.Map<Customer>(request);
 
-            _repository.Insert(entity);
+            _repository.Add(entity);
 
             return new CommandResponse
             {
@@ -57,7 +57,7 @@ namespace Bussines.Concrete
             var validator = new UpdateCustomerRequstValidator();
             validator.Validate(request).ThrowIfException();
 
-            var entity = _repository.Get(request.Id);
+            var entity = _repository.Get(x=>x.Id==request.Id);
             if (entity == null)
             {
                 return new CommandResponse()

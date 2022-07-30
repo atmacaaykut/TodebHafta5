@@ -1,10 +1,12 @@
 ﻿using Bussines.Abstract;
 using DTO.Customer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Models.Entities;
 
 namespace API.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class CustomerController : ControllerBase
@@ -38,6 +40,7 @@ namespace API.Controllers
             return Ok(response);
         }
 
+        [AllowAnonymous]
         [HttpPut]
         public IActionResult Put(UpdateCustomerRequest customer)
         {

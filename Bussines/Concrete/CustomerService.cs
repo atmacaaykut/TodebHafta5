@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using AutoMapper;
+using BackgroundJobs.Abstract;
 using Bussines.Abstract;
 using Bussines.Configuration.Extensions;
 using Bussines.Configuration.Response;
@@ -19,11 +20,13 @@ namespace Bussines.Concrete
     {
         private readonly ICustomerRepository _repository;
         private IMapper _mapper;
+        private IJobs _jobs;
 
-        public CustomerService(ICustomerRepository repository,IMapper mapper)
+        public CustomerService(ICustomerRepository repository,IMapper mapper, IJobs jobs)
         {
             _repository = repository;
             _mapper = mapper;
+            _jobs = jobs;
         }
 
         public IEnumerable<SearchCustomerResponse> GetAll()
@@ -62,10 +65,14 @@ namespace Bussines.Concrete
             //entity.Name = request.Name;
             //entity.Surname = request.Surname;
 
+            
 
-             _repository.Insert(entity);
+             _repository.Add(entity);
 
-             return new CommandResponse
+             _jobs.FireAndForget(entity.Id,entity.Name);
+             _jobs.DelayedJob(entity.Id,entity.Name,TimeSpan.FromSeconds(15));
+
+            return new CommandResponse
              {
                  Status = true,
                  Message = $"Müşteri eklendi. "
@@ -78,7 +85,9 @@ namespace Bussines.Concrete
             var validator = new UpdateCustomerRequstValidator();
             validator.Validate(request).ThrowIfException();
 
-            var entity = _repository.Get(request.Id);
+            var entity = _repository.Get(x=>x.Id==request.Id);
+
+
             if (entity == null)
             {
                 return new CommandResponse()

@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using DTO.Customer;
+using DTO.User;
 using Models.Entities;
 
 namespace Bussines.Configuration.Mapper
@@ -12,6 +13,7 @@ namespace Bussines.Configuration.Mapper
             CreateMap<UpdateCustomerRequest, Customer>();
             CreateMap<Customer, SearchCustomerResponse>();
             CreateMap<Customer, SearchCustomerResponse2>();
+            CreateMap<CreateUserRegisterRequest, User>();
         }
     }
 }
