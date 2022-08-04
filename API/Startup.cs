@@ -1,4 +1,4 @@
-using BackgroundJobs.Abstract;
+﻿using BackgroundJobs.Abstract;
 using BackgroundJobs.Concrete;
 using BackgroundJobs.Concrete.HangfireJobs;
 using Bussines.Abstract;
@@ -18,11 +18,16 @@ using Microsoft.OpenApi.Models;
 using System;
 using System.Collections.Generic;
 using System.Text;
-using Bussines.Configuration.Cache;
+using Cache;
+using Cache.Redis;
+using DAL.Concrete.Mongo;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
+using MongoDB.Driver;
+using ServiceStack.Redis;
 using StackExchange.Redis;
+using RedisEndpointInfo = Bussines.Configuration.Cache.RedisEndpointInfo;
 
 namespace API
 {
@@ -39,14 +44,42 @@ namespace API
         public void ConfigureServices(IServiceCollection services)
         {
 
-            //DI, Singleton, Scope, Transit
 
-            //ICustomerSevice  -- aadeneme, CustomerService
-            //ICustomerRepository -- EFCustomerRepository, DapperRepository
 
             services.AddDbContext<TodebCampDbContext>(ServiceLifetime.Transient);
 
             var redisConfigInfo = Configuration.GetSection("RedisEndpointInfo").Get<RedisEndpointInfo>();
+
+            /*eğer kendi yazdığımız cachemanager kullanacak isek AddStackExchangeRedisCache kısmı 
+            commentlenebilir. aşağıdaki singleton olan implementasyon RedisCacheManager içerisinde kullanılacak olan 
+            RedisEndPoint içindir. RedisEndpoint bir kere tanımlanıp gelen her istekte aynı instance verilir
+            
+            services.AddSingleton<RedisEndpoint>(opt =>
+            {
+                return new RedisEndpoint
+                {
+                    Host = redisConfigInfo.EndPoint,
+                    Port = redisConfigInfo.Port,
+                    Username = redisConfigInfo.UserName,
+                    Password = redisConfigInfo.Password,
+                };
+            });
+
+
+             kendi yazmış olduğumuz CacheManager implemente ediyoruz. 
+            AddStackExchangeRedisCache  kısmı commentlenebilir.
+
+
+            services.AddScoped<ICacheManager, RedisCacheManager>();
+            */
+
+
+            //mongoDb
+            services.AddSingleton<MongoClient>(x => new MongoClient("mongodb://localhost:27017"));
+            services.AddScoped<ICrediCartRepository, CreditCardRepository>();
+            services.AddScoped<ICreditCardService, CreditCardService>();
+
+
             services.AddStackExchangeRedisCache(opt =>
             {
                 opt.ConfigurationOptions = new ConfigurationOptions()
@@ -60,8 +93,13 @@ namespace API
 
                 };
             });
-
             services.AddMemoryCache();
+
+           
+
+
+            services.AddScoped<ICacheExample, CacheExample>();
+            
 
 
             services.AddAutoMapper(config =>
@@ -82,7 +120,7 @@ namespace API
             services.AddScoped<IUserRepository, EFUserRepository>();
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IAuthService, AuthService>();
-            services.AddScoped<ICacheExample, CacheExample>();
+   
 
 
             var tokenOptions = Configuration.GetSection("TokenOptions").Get<Bussines.Configuration.Auth.TokenOption>();
