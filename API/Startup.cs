@@ -18,9 +18,11 @@ using Microsoft.OpenApi.Models;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using Bussines.Configuration.Cache;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
+using StackExchange.Redis;
 
 namespace API
 {
@@ -44,6 +46,24 @@ namespace API
 
             services.AddDbContext<TodebCampDbContext>(ServiceLifetime.Transient);
 
+            var redisConfigInfo = Configuration.GetSection("RedisEndpointInfo").Get<RedisEndpointInfo>();
+            services.AddStackExchangeRedisCache(opt =>
+            {
+                opt.ConfigurationOptions = new ConfigurationOptions()
+                {
+                    EndPoints =
+                    {
+                        { redisConfigInfo.EndPoint, redisConfigInfo.Port }
+                    },
+                    Password = redisConfigInfo.Password,
+                    User = redisConfigInfo.UserName
+
+                };
+            });
+
+            services.AddMemoryCache();
+
+
             services.AddAutoMapper(config =>
             {
                 config.AddProfile(new MapperProfile());
@@ -62,6 +82,7 @@ namespace API
             services.AddScoped<IUserRepository, EFUserRepository>();
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IAuthService, AuthService>();
+            services.AddScoped<ICacheExample, CacheExample>();
 
 
             var tokenOptions = Configuration.GetSection("TokenOptions").Get<Bussines.Configuration.Auth.TokenOption>();

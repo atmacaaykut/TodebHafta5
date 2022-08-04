@@ -9,6 +9,7 @@ using Bussines.Abstract;
 using Bussines.Configuration.Auth;
 using Bussines.Configuration.Response;
 using DAL.Abstract;
+using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 
@@ -18,11 +19,14 @@ namespace Bussines.Concrete
     {
         private readonly IUserRepository _userRepository;
         private readonly IConfiguration _configuration;
+        private readonly IDistributedCache _distributedCache;
 
-        public AuthService(IUserRepository userRepository, IConfiguration configuration)
+        public AuthService(IUserRepository userRepository, 
+            IConfiguration configuration, IDistributedCache distributedCache)
         {
             _userRepository = userRepository;
             _configuration = configuration;
+            _distributedCache = distributedCache;
         }
 
         public CommandResponse VerifyPassword(string email, string password)
@@ -49,6 +53,8 @@ namespace Bussines.Concrete
 
         public AccessToken Login(string email, string password)
         {
+            #region Token
+
             var verifypassword = VerifyPassword(email, password);
 
             var user = _userRepository.Get(x => x.Email == email);
@@ -75,7 +81,13 @@ namespace Bussines.Concrete
                 );
 
                 var token = new JwtSecurityTokenHandler().WriteToken(jwtToken);
+                #endregion
 
+                #region Cache
+                //kullanıcının id ile USR_kullanıcıID key oluşup token kaydedilecek
+                _distributedCache.SetString($"USR_{user.Id}",token);
+
+                #endregion
                 return new AccessToken()
                 {
                     Token = token,
