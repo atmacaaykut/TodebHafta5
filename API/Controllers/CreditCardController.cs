@@ -1,10 +1,14 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using API.Configuration.Filters.Auth;
+using Microsoft.AspNetCore.Mvc;
 using Bussines.Abstract;
+using Microsoft.AspNetCore.Authorization;
 using Models.Document;
+using Models.Entities;
 using MongoDB.Bson;
 
 namespace API.Controllers
 {
+    //[Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class CreditCardController : ControllerBase
@@ -32,6 +36,8 @@ namespace API.Controllers
 
 
         [HttpPost]
+       // [LogFilter]
+        [Permission(Permission.CreditCardPost)]
         public IActionResult Post(CreditCard request)
         {
             _service.Add(request);
@@ -49,6 +55,13 @@ namespace API.Controllers
         public IActionResult Delete(ObjectId id)
         {
             _service.Delete(id);
+            return Ok();
+        }
+
+        [HttpGet("TestExceptionFilter")]
+        public IActionResult TestExceptionFilter()
+        {
+            _service.TestExceptionFilter();
             return Ok();
         }
 

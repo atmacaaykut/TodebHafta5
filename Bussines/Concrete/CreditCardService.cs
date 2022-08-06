@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Bussines.Abstract;
 using DAL.Abstract;
 using Models.Document;
@@ -38,6 +39,11 @@ namespace Bussines.Concrete
         public IEnumerable<CreditCard> GetAll()
         {
             return _repository.GetAll();
+        }
+
+        public void TestExceptionFilter()
+        {
+            throw new Exception("Test");
         }
     }
 }

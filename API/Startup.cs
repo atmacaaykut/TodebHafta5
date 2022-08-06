@@ -18,6 +18,8 @@ using Microsoft.OpenApi.Models;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using API.Configuration.Filters.Exception;
+using API.Configuration.Filters.Logs;
 using Cache;
 using Cache.Redis;
 using DAL.Concrete.Mongo;
@@ -78,6 +80,7 @@ namespace API
             services.AddSingleton<MongoClient>(x => new MongoClient("mongodb://localhost:27017"));
             services.AddScoped<ICrediCartRepository, CreditCardRepository>();
             services.AddScoped<ICreditCardService, CreditCardService>();
+            services.AddSingleton<MsSqlLogger>();
 
 
             services.AddStackExchangeRedisCache(opt =>
@@ -124,7 +127,12 @@ namespace API
 
 
             var tokenOptions = Configuration.GetSection("TokenOptions").Get<Bussines.Configuration.Auth.TokenOption>();
-            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+            services.AddAuthentication(opt=>
+                {
+                   opt.DefaultAuthenticateScheme= JwtBearerDefaults.AuthenticationScheme;
+                   opt.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                   opt.DefaultForbidScheme = JwtBearerDefaults.AuthenticationScheme;
+                })
                 .AddJwtBearer(options =>
                 {
                     options.TokenValidationParameters = new TokenValidationParameters
@@ -160,7 +168,10 @@ namespace API
 
             services.AddHangfireServer();
 
-            services.AddControllers();
+            services.AddControllers(opt =>
+            {
+                opt.Filters.Add<ExceptionFilter>();
+            });
 
             services.AddSwaggerGen(c =>
             {

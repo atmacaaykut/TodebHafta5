@@ -11,5 +11,6 @@ namespace Bussines.Abstract
         void Delete(ObjectId id);
         CreditCard Get(ObjectId id);
         IEnumerable<CreditCard> GetAll();
+        void TestExceptionFilter();
     }
 }

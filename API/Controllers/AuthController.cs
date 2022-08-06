@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace API.Controllers
 {
-    
+
     [Route("api/[controller]")]
     [ApiController]
     public class AuthController : ControllerBase
@@ -26,6 +26,7 @@ namespace API.Controllers
         {
             var response = _authService.VerifyPassword(email, password);
             return Ok(response);
+
         }
 
         [HttpGet("Login")]

@@ -1,4 +1,5 @@
-﻿using Bussines.Abstract;
+﻿using API.Configuration.Filters.Auth;
+using Bussines.Abstract;
 using DTO.Customer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -34,6 +35,7 @@ namespace API.Controllers
         }
 
         [HttpPost]
+        [Permission(Permission.CustomerPost)]
         public IActionResult Post(CreateCustomerRequest customer)
         {
             var response = _service.Insert(customer);

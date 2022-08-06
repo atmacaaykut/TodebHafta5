@@ -12,6 +12,7 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="6.0.7" />
+    <PackageReference Include="Serilog.Sinks.MSSqlServer" Version="5.7.1" />
     <PackageReference Include="ServiceStack.Redis" Version="6.2.0" />
     <PackageReference Include="StackExchange.Redis" Version="2.6.48" />
     <PackageReference Include="StackExchange.Redis.Extensions.Core" Version="8.0.5" />

@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Bussines.Abstract;
 using Bussines.Configuration.Auth;
+using Bussines.Configuration.Helper;
 using Bussines.Configuration.Response;
 using DAL.Abstract;
 using Microsoft.Extensions.Caching.Distributed;
@@ -59,6 +60,7 @@ namespace Bussines.Concrete
 
             var user = _userRepository.Get(x => x.Email == email);
 
+
             if (verifypassword.Status)
             {
                 var tokenOptions = _configuration.GetSection("TokenOptions").Get<TokenOption>();
@@ -68,7 +70,8 @@ namespace Bussines.Concrete
                 {
                     new Claim(ClaimTypes.Email, user.Email),
                     new Claim(ClaimTypes.GivenName, user.Name),
-                    new Claim(ClaimTypes.Role,user.Role.ToString())
+                    new Claim(ClaimTypes.Role,user.Role.ToString()),
+                    new Claim("ForCache",StringHelper.CreateCacheKey(user.Name,user.Id))
                 };
 
                 SecurityKey securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(tokenOptions.SecurityKey));
