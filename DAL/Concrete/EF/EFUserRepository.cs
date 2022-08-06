@@ -25,5 +25,12 @@ namespace DAL.Concrete.EF
                 .FirstOrDefault(x => x.Email == email);
         }
 
+        public User GetUserWithPermission(string email)
+        {
+            return Context.Users
+                .Include(x => x.Permissions).FirstOrDefault(x => x.Email == email);
+
+        }
+
     }
 }

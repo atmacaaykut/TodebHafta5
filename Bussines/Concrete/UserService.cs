@@ -41,10 +41,11 @@ namespace Bussines.Concrete
                 PasswordSalt = passwordSalt
             };
 
-            user.Permissions = register.UserPermissions.Select(x => new UserPermission()
-            {
-                Permission = x
-            }).ToList();
+            // burada yaptığımız işlemi AutoMapper aldık.
+            //user.Permissions = register.UserPermissions.Select(x => new UserPermission()
+            //{
+            //    Permission = x
+            //}).ToList();
 
             _userRepository.Add(user);
             _userRepository.SaveChanges();

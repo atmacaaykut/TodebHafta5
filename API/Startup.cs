@@ -17,6 +17,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using System;
 using System.Collections.Generic;
+using System.Net;
 using System.Text;
 using API.Configuration.Filters.Exception;
 using API.Configuration.Filters.Logs;
@@ -24,7 +25,10 @@ using Cache;
 using Cache.Redis;
 using DAL.Concrete.Mongo;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Diagnostics;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using MongoDB.Driver;
 using ServiceStack.Redis;
@@ -170,7 +174,7 @@ namespace API
 
             services.AddControllers(opt =>
             {
-                opt.Filters.Add<ExceptionFilter>();
+               // opt.Filters.Add<ExceptionFilter>();
             });
 
             services.AddSwaggerGen(c =>
@@ -217,6 +221,26 @@ namespace API
                 app.UseSwagger();
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "API v1"));
             }
+
+            app.UseExceptionHandler(c=>c.Run(async context=>
+            {
+                var exception = context.Features.Get<IExceptionHandlerFeature>().Error;
+
+                 var jsonResult = new JsonResult(
+                    new
+                    {
+                        error = exception.Message,
+                        innerException = exception.InnerException,
+                        statusCode = HttpStatusCode.InternalServerError
+                    }
+
+                );
+                 context.Response.StatusCode = (int)HttpStatusCode.BadRequest; 
+                 await context.Response.WriteAsJsonAsync(jsonResult);
+            }));
+
+
+
 
             app.UseHangfireDashboard("/TodebHangfire", new DashboardOptions()
             {

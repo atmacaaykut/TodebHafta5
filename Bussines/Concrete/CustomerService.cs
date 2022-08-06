@@ -68,6 +68,8 @@ namespace Bussines.Concrete
             
 
              _repository.Add(entity);
+            _repository.SaveChanges();
+
 
              _jobs.FireAndForget(entity.Id,entity.Name);
              _jobs.DelayedJob(entity.Id,entity.Name,TimeSpan.FromSeconds(15));

@@ -19,6 +19,8 @@ namespace API.Configuration.Filters.Auth
 
         public void OnAuthorization(AuthorizationFilterContext context)
         {
+
+
             var cacheClaim = context.HttpContext.User.Claims.FirstOrDefault(x => x.Type == "ForCache");
             if (cacheClaim == null)
                 context.Result = new BadRequestResult();
