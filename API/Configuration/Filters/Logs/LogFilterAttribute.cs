@@ -4,7 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Console = System.Console;
 
 
-namespace API.Configuration.Filters.Log
+namespace API.Configuration.Filters.Logs
 {
     public class LogFilterAttribute: Attribute, IActionFilter
     {

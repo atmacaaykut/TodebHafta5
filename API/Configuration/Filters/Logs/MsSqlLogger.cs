@@ -2,7 +2,7 @@
 using Serilog;
 using Serilog.Sinks.MSSqlServer;
 
-namespace API.Configuration.Filters.Log
+namespace API.Configuration.Filters.Logs
 {
 
     public class MsSqlLogger
